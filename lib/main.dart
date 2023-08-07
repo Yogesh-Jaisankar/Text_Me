@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      debugShowMaterialGrid: false,
       title: 'Snapchat+',
       theme: ThemeData(
         fontFamily: 'Poppins',
