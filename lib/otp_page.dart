@@ -53,7 +53,8 @@ class _OtpPageState extends State<OtpPage> {
       Get.snackbar(
         e.message.toString(),
         "Failed",
-        colorText: Colors.white,
+        colorText: Colors.black54,
+        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }

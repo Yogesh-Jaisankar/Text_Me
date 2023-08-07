@@ -11,6 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _isLoading = false;
   final TextEditingController phoneController = TextEditingController();
 
   Future<void> signInWithPhoneNumber(String phoneNumber) async {
@@ -21,8 +22,14 @@ class _LoginPageState extends State<LoginPage> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         await auth.signInWithCredential(credential);
         // authentication successful, do something
+        setState(() {
+          _isLoading = false; // Hide progress indicator
+        });
       },
       verificationFailed: (FirebaseAuthException e) {
+        setState(() {
+          _isLoading = false; // Hide progress indicator
+        });
         // authentication failed, do something
       },
       codeSent: (String verificationId, int? resendToken) async {
@@ -36,7 +43,11 @@ class _LoginPageState extends State<LoginPage> {
         await auth.signInWithCredential(credential);
         // authentication successful, do something
       },
-      codeAutoRetrievalTimeout: (String verificationId) {},
+      codeAutoRetrievalTimeout: (String verificationId) {
+        setState(() {
+          _isLoading = false; // Hide progress indicator when timeout occurs
+        });
+      },
     );
   }
 
@@ -63,6 +74,9 @@ class _LoginPageState extends State<LoginPage> {
         snackPosition: SnackPosition.BOTTOM,
       );
     } else {
+      setState(() {
+        _isLoading = true; // Show progress indicator
+      });
       signInWithPhoneNumber("+${selectedCountry.phoneCode}$mobile");
     }
   }
@@ -212,12 +226,14 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 30),
               ElevatedButton(
-                  style: style,
-                  onPressed: _userLogin,
-                  child: const Text(
-                    'GET OTP',
-                    style: TextStyle(fontSize: 14, color: Colors.white,fontWeight: FontWeight.bold),
-                  )),
+                style: style,
+                onPressed: _isLoading ? null : _userLogin, // Disable button while loading
+                child: _isLoading
+                    ? CircularProgressIndicator() // Show progress indicator
+                    : const Text(
+                  'GET OTP',
+                  style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+                ),),
               SizedBox(height: 80),
 
             ],
