@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:snapchat_clone/helper/helper.dart';
 import 'package:snapchat_clone/search.dart';
-
+import 'package:get/get.dart';
 
 
 class Home extends StatelessWidget {
@@ -124,8 +124,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       //_launchUrlhelp();
                     },),
                     PopupMenuItem(child: Text("Log Out"),onTap: (){
+                      Get.snackbar(
+                        "Logged Out Successfully",
+                        "Login to countinue using Text Me™",
+                        colorText: Colors.black54,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
                       authservice AuthService = authservice();
                       authService.logOutUser(context);
+
                     },)
                     ,
                   ];

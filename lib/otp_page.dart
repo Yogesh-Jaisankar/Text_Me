@@ -74,8 +74,9 @@ class _OtpPageState extends State<OtpPage> {
     } else {
       Get.snackbar(
         "Enter 6-Digit code",
-        "Failed",
-        colorText: Colors.white,
+        "Failed to verify",
+        colorText: Colors.black54,
+        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
