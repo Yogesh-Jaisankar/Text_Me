@@ -229,7 +229,11 @@ class _LoginPageState extends State<LoginPage> {
                 style: style,
                 onPressed: _isLoading ? null : _userLogin, // Disable button while loading
                 child: _isLoading
-                    ? CircularProgressIndicator() // Show progress indicator
+                    ? CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(
+                        Colors.teal
+                    )
+                ) // Show progress indicator
                     : const Text(
                   'GET OTP',
                   style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),

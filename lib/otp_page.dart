@@ -13,6 +13,9 @@ class OtpPage extends StatefulWidget {
 
 class _OtpPageState extends State<OtpPage> {
 
+  bool _isVerified = false;
+
+
   Future<bool> _onWillPop() async {
     return false; //<-- SEE HERE
   }
@@ -47,6 +50,11 @@ class _OtpPageState extends State<OtpPage> {
           verificationId: verificationId, smsCode: userOtp);
       User? user = (await auth.signInWithCredential(creds)).user;
       if (user != null) {
+        setState(() {
+          _isVerified = true;
+        });
+        // Delay navigation to simulate progress
+        await Future.delayed(Duration(seconds: 2));
         Get.to(Home());
       }
     } on FirebaseAuthException catch (e) {
@@ -124,7 +132,11 @@ class _OtpPageState extends State<OtpPage> {
                 ),
                 SizedBox(height: 50),
                 Center(
-                  child: Pinput(
+                  child: _isVerified?CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(
+                      Colors.teal
+                    )
+                  ):Pinput(
                     length: 6,
                     showCursor: true,
                     defaultPinTheme: PinTheme(
