@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:snapchat_clone/edit_profile.dart';
 import 'package:snapchat_clone/helper/helper.dart';
+import 'package:snapchat_clone/profile.dart';
 import 'package:snapchat_clone/search.dart';
 import 'package:get/get.dart';
 
@@ -67,14 +69,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
       title: Text("Text Me™",
-          style: TextStyle(color:HexColor("#BB8FCE"),
+          style: TextStyle(color: Colors.teal,
               fontFamily: 'Poppins',
           )),
       actions: [
         Padding(
           padding: const EdgeInsets.all(5.0),
-          child: CircleAvatar(
-            backgroundImage: AssetImage('assets/man1.png'),
+          child: InkWell(
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Profile()),
+              );
+            },
+            child: CircleAvatar(
+              backgroundImage: AssetImage('assets/man1.png'),
+            ),
           ),
         ),
         SizedBox(width: 10), // Add spacing between the avatar and the icon

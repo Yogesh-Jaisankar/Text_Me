@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:snapchat_clone/home.dart';
 import 'package:snapchat_clone/login_screen.dart';
-import 'package:snapchat_clone/otp_page.dart';
+
 
 
 

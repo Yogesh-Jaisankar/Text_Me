@@ -5,7 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pinput/pinput.dart';
 import 'package:snapchat_clone/home.dart';
-import 'package:snapchat_clone/home_page.dart';
+import 'package:snapchat_clone/profile.dart';
 
 class OtpPage extends StatefulWidget {
   @override
@@ -79,7 +79,7 @@ class _OtpPageState extends State<OtpPage> {
         });
         // Delay navigation to simulate progress
         await Future.delayed(Duration(seconds: 2));
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (C)=>Home()), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (C)=>Profile()), (route) => false);
       }
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
