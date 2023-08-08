@@ -26,6 +26,39 @@ class _ProfileState extends State<Profile> {
   bool _showProgressIndicator = false;
   bool _isNameFieldEmpty = true;
 
+  void _showTermsAndConditionsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Terms and Conditions"),
+          content: SingleChildScrollView(
+            child: Text(
+              "We value your privacy and are committed to maintaining the confidentiality of your personal data. When using our chat app developed with Flutter, please be assured that any collection and storage of photos are treated with the utmost respect for your privacy.\n\n"
+                  "Privacy Commitment:\n"
+                  "• Private Storage: Any photos shared or uploaded within the app are stored securely within our encrypted database. Access to these photos is restricted to authorized personnel only and is subject to stringent security measures.\n"
+                  "• No Misuse: We guarantee that your photos will not be misused, shared, or sold to any third parties for marketing or any other purposes. Your photos remain entirely your property, and we do not claim any rights over them.\n"
+                  "• Data Encryption: All photos stored in our database are encrypted to prevent unauthorized access. This adds an extra layer of protection to your sensitive visual data.\n"
+                  "• Limited Access: Our team has limited access to the stored photos and strictly adheres to a policy of non-disclosure. Only necessary technical and support personnel will have controlled access to ensure smooth functioning and troubleshooting.\n"
+                  "• User Control: You have complete control over the photos you share within the app. You can delete or remove them at any time, and they will be permanently deleted from our servers.\n"
+                  "• Continuous Monitoring: We continually monitor and update our security measures to adapt to the evolving privacy landscape and ensure that your data remains secure.\n"
+                  "By using our chat app, you acknowledge and agree that any photos shared and stored within the app are subject to this privacy commitment. Please take a moment to review our full Privacy Policy to understand how we collect, process, and protect your data. If you have any concerns or questions regarding your privacy, please feel free to contact our support team at support@email.com.\n"
+                  "Your trust is of utmost importance to us, and we are dedicated to providing you with a secure and enjoyable chatting experience.",
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _selectImage()async{
     Uint8List img = await pickImage(ImageSource.gallery);
     setState(() {
@@ -107,15 +140,6 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-
-
-
-  Future<Uint8List> getDefaultProfileImage() async {
-    // Load your default profile image asset and convert it to Uint8List
-    // For example:
-    final ByteData defaultImageByteData = await rootBundle.load('assets/man1.png');
-    return defaultImageByteData.buffer.asUint8List();
-  }
 
   void _updateNameField(String text) {
     setState(() {
@@ -213,7 +237,19 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
-
+              Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: TextButton(
+                  onPressed: _showTermsAndConditionsDialog,
+                  child: Text(
+                    "Terms and Conditions©",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      //decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
