@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       title: 'Text Me™',
       theme: ThemeData(
         fontFamily: 'Poppins',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
       home:  auth.currentUser==null?LoginPage():Home(),

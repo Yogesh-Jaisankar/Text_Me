@@ -181,11 +181,11 @@ class _ProfileState extends State<Profile> {
                     backgroundImage: AssetImage('assets/man1.png'),
                   ),
                   Positioned(child: IconButton(
-                    icon: Icon(Icons.edit,color: Colors.black,),
+                    icon: Icon(Icons.add_circle_rounded,color: Colors.teal,size: 30,),
                     onPressed:_selectImage,
                   ),
-                    bottom: 10,
-                    left: 80,
+                    bottom: -11,
+                    left: 90,
                   )
                 ],
               ),

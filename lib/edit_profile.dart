@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:snapchat_clone/home.dart';
 import 'package:snapchat_clone/resource/add_data.dart';
 import 'package:snapchat_clone/utils.dart';
@@ -199,10 +200,19 @@ class _Edit_ProfileState extends State<Edit_Profile> {
             width: MediaQuery.of(context).size.width * 0.8,
             height: MediaQuery.of(context).size.height * 0.8,
             child: _image != null
-                ? Image.memory(_image!, fit: BoxFit.contain)
+                ? PhotoView(
+              imageProvider: MemoryImage(_image!),
+              backgroundDecoration: BoxDecoration(color: Colors.transparent),
+            )
                 : _currentImageUrl.isNotEmpty
-                ? Image.network(_currentImageUrl, fit: BoxFit.contain)
-                : Image.asset('assets/man1.png', fit: BoxFit.contain),
+                ? PhotoView(
+              imageProvider: NetworkImage(_currentImageUrl),
+              backgroundDecoration: BoxDecoration(color: Colors.transparent),
+            )
+                : PhotoView(
+              imageProvider: AssetImage('assets/man1.png'),
+              backgroundDecoration: BoxDecoration(color: Colors.transparent),
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -216,6 +226,7 @@ class _Edit_ProfileState extends State<Edit_Profile> {
       },
     );
   }
+
 
   final ButtonStyle style = ElevatedButton.styleFrom(
       minimumSize: Size(188, 48),
