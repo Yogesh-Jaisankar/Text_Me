@@ -5,6 +5,7 @@ import 'package:snapchat_clone/helper/helper.dart';
 import 'package:snapchat_clone/profile.dart';
 import 'package:snapchat_clone/search.dart';
 import 'package:get/get.dart';
+import 'package:snapchat_clone/test.dart';
 
 
 class Home extends StatelessWidget {
@@ -79,7 +80,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             onTap: (){
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Profile()),
+                MaterialPageRoute(builder: (context) => Edit_Profile()),
               );
             },
             child: CircleAvatar(

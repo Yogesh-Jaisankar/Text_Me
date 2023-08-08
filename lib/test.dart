@@ -1,53 +1,103 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
-void main() => runApp(test());
-
-class test extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: CustomAppBar(),
-        drawer: Drawer(), // Add your custom drawer content here
-        body: Center(
-          child: Text("Your app content goes here"),
-        ),
-      ),
-    );
-  }
+void main() {
+  runApp(MaterialApp(
+    home: ViewProfilePage(),
+  ));
 }
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class ViewProfilePage extends StatefulWidget {
+  const ViewProfilePage({Key? key}) : super(key: key);
+
   @override
-  Size get preferredSize => Size.fromHeight(56.0); // Adjust the height as needed
+  _ViewProfilePageState createState() => _ViewProfilePageState();
+}
+
+class _ViewProfilePageState extends State<ViewProfilePage> {
+  Uint8List? _image; // Replace this with your actual image data
+  String _name = 'John Doe'; // Replace this with the user's actual name
+  TextEditingController _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = _name;
+  }
+
+  void _selectImage() async {
+    // Implement image selection logic here
+    // Set _image with the new image data
+  }
+
+  void _saveChanges() {
+    setState(() {
+      _name = _nameController.text;
+    });
+    // Save changes to the backend (update name and/or image)
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      title: Text("Snapchat+",style: TextStyle(color: Colors.black87,),),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.search,color: Colors.black87,),
-          onPressed: () {
-            // Add your search functionality here
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.add,color: Colors.black87,),
-          onPressed: () {
-            // Add your "Add Contact" functionality here
-          },
-        ),
-      ],
-      leading: IconButton(
-        icon: Icon(Icons.menu,color: Colors.black87,),
-        onPressed: () {
-          Scaffold.of(context).openDrawer(); // Open the side drawer
-        },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('View Profile'),
+        centerTitle: true,
       ),
-      centerTitle: true,
-      elevation: 0, // Remove the shadow below the AppBar
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: _selectImage,
+                child: Stack(
+                  children: [
+                    _image !=null?
+                    CircleAvatar(
+                      radius: 65,
+                      backgroundImage: MemoryImage(_image!),
+                    ):
+                    CircleAvatar(
+                      radius: 65,
+                      backgroundImage: AssetImage('assets/man1.png'),
+                    ),
+                    Positioned(child: IconButton(
+                      icon: Icon(Icons.edit,color: Colors.black,),
+                      onPressed:_selectImage,
+                    ),
+                      bottom: 10,
+                      left: 80,
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Tap the image to change profile picture',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _saveChanges,
+                child: Text('Save Changes'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

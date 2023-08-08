@@ -88,6 +88,35 @@ class _Edit_ProfileState extends State<Edit_Profile> {
     }
   }
 
+  late String _currentName = '';
+  late String _currentImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      String phoneNumber = auth.currentUser!.phoneNumber!;
+      QuerySnapshot snapshot = await firestore
+          .collection("user")
+          .where("phone", isEqualTo: phoneNumber)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        DocumentSnapshot userSnapshot = snapshot.docs.first;
+        setState(() {
+          _currentName = userSnapshot["name"];
+          _currentImageUrl = userSnapshot["image link"];
+        });
+      }
+    } catch (error) {
+      print("Error fetching user data: $error");
+    }
+  }
+
 
 
   Future<Uint8List> getDefaultProfileImage() async {
@@ -127,14 +156,16 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                 SizedBox(height: 10 ),
                 Stack(
                   children: [
-                    _image !=null?
-                    CircleAvatar(
+                    _image != null
+                        ? CircleAvatar(
                       radius: 65,
                       backgroundImage: MemoryImage(_image!),
-                    ):
-                    CircleAvatar(
+                    )
+                        : CircleAvatar(
                       radius: 65,
-                      backgroundImage: AssetImage('assets/man1.png'),
+                      backgroundImage: _currentImageUrl.isNotEmpty
+                          ? NetworkImage(_currentImageUrl)
+                          : AssetImage('assets/man1.png') as ImageProvider,
                     ),
                     Positioned(child: IconButton(
                       icon: Icon(Icons.edit,color: Colors.black,),
