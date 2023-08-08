@@ -5,7 +5,6 @@ import 'package:snapchat_clone/helper/helper.dart';
 import 'package:snapchat_clone/profile.dart';
 import 'package:snapchat_clone/search.dart';
 import 'package:get/get.dart';
-import 'package:snapchat_clone/test.dart';
 
 
 class Home extends StatelessWidget {
@@ -74,20 +73,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               fontFamily: 'Poppins',
           )),
       actions: [
-        Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: InkWell(
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Edit_Profile()),
-              );
-            },
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/man1.png'),
-            ),
-          ),
-        ),
         SizedBox(width: 10), // Add spacing between the avatar and the icon
         Padding(
           padding: const EdgeInsets.all(5.0),
@@ -128,9 +113,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               enableFeedback: true,
                 itemBuilder: (BuildContext context){
                   return [
-                    PopupMenuItem(child: Text("FAQ's"),onTap: (){
-                      //_launchUrlfaq();
-                    },),
+                    PopupMenuItem(child: Text("Settings"),onTap: () => Future(
+                          () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => Edit_Profile()),
+                      ),
+                    )
+                    ),
                     PopupMenuItem(child: Text("Help"),onTap: (){
                       //_launchUrlhelp();
                     },),
