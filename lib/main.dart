@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
-      title: 'Snapchat+',
+      title: 'Text Me™',
       theme: ThemeData(
         fontFamily: 'Poppins',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

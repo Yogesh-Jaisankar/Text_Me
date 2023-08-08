@@ -79,7 +79,7 @@ class _OtpPageState extends State<OtpPage> {
         });
         // Delay navigation to simulate progress
         await Future.delayed(Duration(seconds: 2));
-        Get.to(Home());
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (C)=>Home()), (route) => false);
       }
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
