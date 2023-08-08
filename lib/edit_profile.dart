@@ -55,17 +55,38 @@ class _Edit_ProfileState extends State<Edit_Profile> {
       if (snapshot.docs.isNotEmpty) {
         // Update existing user's profile
         DocumentSnapshot userSnapshot = snapshot.docs.first;
-        await userSnapshot.reference.update({
-          "name": name,
-          "image link": await StoreData().uploadImageToStorage('ProfileImage', _image!),
-        });
+        if (_image != null) {
+          // If a new image is selected, upload it and update the existing document
+          String imageUrl = await StoreData().uploadImageToStorage(
+              'ProfileImage', _image!);
+          await userSnapshot.reference.update({
+            "name": name,
+            "image link": imageUrl,
+          });
+        } else {
+          // If no new image is selected, update the name only
+          await userSnapshot.reference.update({
+            "name": name,
+          });
+        }
       } else {
         // Create new user's profile
-        await firestore.collection("user").add({
-          "phone": phoneNumber,
-          "name": name,
-          "image link": await StoreData().uploadImageToStorage('ProfileImage', _image!),
-        });
+        if (_image != null) {
+          // If a new image is selected, upload it and create a new document
+          String imageUrl = await StoreData().uploadImageToStorage(
+              'ProfileImage', _image!);
+          await firestore.collection("user").add({
+            "phone": phoneNumber,
+            "name": name,
+            "image link": imageUrl,
+          });
+        } else {
+          // If no new image is selected, create a new document without the image
+          await firestore.collection("user").add({
+            "phone": phoneNumber,
+            "name": name,
+          });
+        }
       }
 
       setState(() {
@@ -76,7 +97,7 @@ class _Edit_ProfileState extends State<Edit_Profile> {
       // Navigate to the home page after successful saving
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Home()), // Replace 'Home()' with your home page widget
+        MaterialPageRoute(builder: (context) => Home()),
             (route) => false,
       );
     } catch (error) {
@@ -87,6 +108,7 @@ class _Edit_ProfileState extends State<Edit_Profile> {
       });
     }
   }
+
 
   late String _currentName = '';
   late String _currentImageUrl = '';
@@ -110,6 +132,7 @@ class _Edit_ProfileState extends State<Edit_Profile> {
         setState(() {
           _currentName = userSnapshot["name"];
           _currentImageUrl = userSnapshot["image link"];
+          nameControl.text = _currentName;
         });
       }
     } catch (error) {
@@ -128,9 +151,10 @@ class _Edit_ProfileState extends State<Edit_Profile> {
 
   void _updateNameField(String text) {
     setState(() {
-      _isNameFieldEmpty = text.isEmpty; // Update the flag based on the text
+      _isNameFieldEmpty = text.isEmpty && _currentName.isEmpty;
     });
   }
+
 
   final ButtonStyle style = ElevatedButton.styleFrom(
       minimumSize: Size(188, 48),
@@ -167,41 +191,50 @@ class _Edit_ProfileState extends State<Edit_Profile> {
                           ? NetworkImage(_currentImageUrl)
                           : AssetImage('assets/man1.png') as ImageProvider,
                     ),
-                    Positioned(child: IconButton(
-                      icon: Icon(Icons.edit,color: Colors.black,),
-                      onPressed:_selectImage,
-                    ),
-                      bottom: 10,
-                      left: 80,
-                    )
+                    // Positioned(child: IconButton(
+                    //   icon: Icon(Icons.add_a_photo_rounded,color: Colors.black,size: 30,),
+                    //   onPressed:_selectImage,
+                    // ),
+                    //   bottom: -15,
+                    //   left: 80,
+                    // )
                   ],
                 ),
-                SizedBox(height: 5),
-                Center(
-                  child: Text(
-                    "Change Profile Picture",
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: _selectImage,
+                  child: Center(
+                    child: Text(
+                      "Click to Change Profile Picture",
+                      style: TextStyle(fontSize: 12, color: Colors.black),
+                    ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(30.0),
                   child: TextField(
                     controller: nameControl,
-                    onChanged: _updateNameField, // Add onChanged callback
+                    onChanged: _updateNameField,
                     decoration: InputDecoration(
                       labelText: "Name",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      errorText: _isNameFieldEmpty ? 'Name cannot be empty' : null, // Show error text if empty
+                      // Remove the errorText property
                     ),
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    "Change name",
+                    style: TextStyle(fontSize: 12, color: Colors.black),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(30.0),
                   child: ElevatedButton(
                     style: style,
-                    onPressed: _isButtonDisabled || _isNameFieldEmpty
+                    onPressed: _isButtonDisabled || (_isNameFieldEmpty && _image == null)
                         ? null
                         : _saveProfile,
                     child: Row(
