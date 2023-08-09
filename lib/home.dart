@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:snapchat_clone/chat_user.dart';
 import 'package:snapchat_clone/edit_profile.dart';
 import 'package:snapchat_clone/helper/helper.dart';
 import 'package:snapchat_clone/profile.dart';
@@ -100,7 +101,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Icons.person_add,
                 color: Colors.black54,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,MaterialPageRoute(builder: (context) =>UserListPage()));
+              },
             ),
           ),
         ),

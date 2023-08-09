@@ -31,12 +31,24 @@ class StoreData{
     String resp = "Some Error Occurred";
     try {
       if (name.isNotEmpty) {
-        String imageUrl = await uploadImageToStorage(name, file); // Use name as childName
+        String imageName = '${auth.currentUser!.uid}-$name'; // Construct image name
+        String imageUrl = await uploadImageToStorage(imageName, file); // Use consistent image name
+
+        // Delete the old image if it exists
+        String oldImageName = '${auth.currentUser!.uid}-$name'; // Construct old image name
+        Reference oldImageRef = _storage.ref().child(oldImageName);
+        try {
+          await oldImageRef.delete();
+        } catch (deleteError) {
+          print("Error deleting old image: $deleteError");
+        }
+
         firestore.collection("user").add({
           "uid": auth.currentUser!.uid,
           "name": name,
           "image link": imageUrl,
         });
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (C) => Home()),
@@ -49,5 +61,4 @@ class StoreData{
     }
     return resp;
   }
-
 }

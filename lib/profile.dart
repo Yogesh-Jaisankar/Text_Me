@@ -86,7 +86,7 @@ class _ProfileState extends State<Profile> {
           .get();
 
       if (_image != null) { // Check if an image is selected
-        String imageName = '${auth.currentUser!.uid}-ProfileImage'; // Construct the image name
+        String imageName = '${auth.currentUser!.uid}-$name'; // Construct the image name
         String imageUrl = await StoreData().uploadImageToStorage(imageName, _image!);
 
         if (snapshot.docs.isNotEmpty) {
