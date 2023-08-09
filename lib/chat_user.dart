@@ -20,59 +20,103 @@ class _UserListPageState extends State<UserListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User List'),
+        title: Text('Add friend'),
       ),
-      body: StreamBuilder(
-        stream: _firestore.collection('user').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return CircularProgressIndicator();
-          }
+      body: Stack(
+        children:[ StreamBuilder(
+          stream: _firestore.collection('user').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return CircularProgressIndicator();
+            }
 
-          var users = snapshot.data?.docs;
-          var currentUserPhoneNumber = _auth.currentUser?.phoneNumber;
+            var users = snapshot.data?.docs;
+            var currentUserPhoneNumber = _auth.currentUser?.phoneNumber;
 
-          return ListView.builder(
-            itemCount: users?.length,
-            itemBuilder: (context, index) {
-              var user = users?[index].data() as Map<String, dynamic>;
-              String name = user['name'] ?? 'Unknown';
-              String phoneNumber = user['phone'] ?? '';
-              String imageUrl = user['image link'] ?? '';
+            return ListView.builder(
+              itemCount: users?.length,
+              itemBuilder: (context, index) {
+                var user = users?[index].data() as Map<String, dynamic>;
+                String name = user['name'] ?? 'Unknown';
+                String phoneNumber = user['phone'] ?? '';
+                String imageUrl = user['image link'] ?? '';
 
-              if (currentUserPhoneNumber == phoneNumber) {
-                // Skip displaying the current user
-                return SizedBox.shrink();
-              }
-
-              return Container(
-                margin: EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
+                if (currentUserPhoneNumber == phoneNumber) {
+                  // Skip displaying the current user
+                  return SizedBox.shrink();
+                }
+                return customListTile(
                   leading: Stack(
                     children: [
-                      _image != null
-                          ? CircleAvatar(
-                        radius: 65,
-                        backgroundImage: MemoryImage(_image!),
-                      )
-                          : CircleAvatar(
-                        radius: 65,
+                      CircleAvatar(
+                        radius: 30,
                         backgroundImage: imageUrl.isNotEmpty
                             ? CachedNetworkImageProvider(imageUrl)
                             : AssetImage('assets/man1.png') as ImageProvider,
                       ),
                     ],
                   ),
-                  title: Text(name),
-                ),
-              );
-            },
-          );
-        },
+                  title: name,
+                 );
+                },
+            );
+           },
+          ),
+          // Positioned(
+          //     left: 0,
+          //     right: 0,
+          //     bottom: 0,
+          //     child:Container(
+          //       //color: Colors.grey[200],
+          //       padding: EdgeInsets.symmetric(vertical: 8),
+          //       child: Center(
+          //         child: Text(
+          //           "Made with 💜 in India",
+          //           style: TextStyle(
+          //             color: Colors.black,
+          //             fontSize: 14,
+          //           ),
+          //         ),
+          //       ),
+          //     )
+          //   )
+        ]
       ),
     );
   }
 }
+
+Widget customListTile({
+  required Widget leading,
+  required String title,
+}) {
+  return Container(
+    margin: EdgeInsets.symmetric(vertical: 8),
+    padding: EdgeInsets.symmetric(horizontal: 16),
+    child: Row(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.teal, // Adjust the color as needed
+              width: 2, // Adjust the border width as needed
+            ),
+          ),
+          child: leading,
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
 void main() {
   runApp(MaterialApp(home: UserListPage()));
