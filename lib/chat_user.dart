@@ -57,6 +57,11 @@ class _UserListPageState extends State<UserListPage> {
                     ],
                   ),
                   title: name,
+                  onTap: () {
+                    // Handle the chat action here
+                    print('Chat with $name');
+                    // You can open a chat screen or perform any other action
+                  },
                  );
                 },
             );
@@ -89,30 +94,43 @@ class _UserListPageState extends State<UserListPage> {
 Widget customListTile({
   required Widget leading,
   required String title,
+  VoidCallback? onTap,
 }) {
-  return Container(
-    margin: EdgeInsets.symmetric(vertical: 8),
-    padding: EdgeInsets.symmetric(horizontal: 16),
-    child: Row(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.teal, // Adjust the color as needed
-              width: 2, // Adjust the border width as needed
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.teal,
+                width: 2,
+              ),
+            ),
+            child: leading,
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Row(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 16),
+                ),
+                Spacer(),
+                Icon(
+                  Icons.chat,  // Add the chat icon
+                  color: Colors.teal,
+                ),
+              ],
             ),
           ),
-          child: leading,
-        ),
-        SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
