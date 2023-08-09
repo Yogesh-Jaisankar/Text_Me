@@ -4,6 +4,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'otp_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -125,9 +126,28 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = true; // Show progress indicator
       });
-      signInWithPhoneNumber("+${selectedCountry.phoneCode}$mobile");
+
+      // Request permissions for contacts and SMS
+      Map<Permission, PermissionStatus> permissions = await [
+        Permission.contacts,
+        Permission.sms,
+      ].request();
+
+      // Check if permissions were granted
+      if (permissions[Permission.contacts] == PermissionStatus.granted &&
+          permissions[Permission.sms] == PermissionStatus.granted) {
+        // Permissions granted, proceed with phone number authentication
+        signInWithPhoneNumber("+${selectedCountry.phoneCode}$mobile");
+      } else {
+        // Permissions not granted
+        setState(() {
+          _isLoading = false; // Hide progress indicator
+        });
+        // You can show a snackbar or dialog to inform the user about permissions not granted
+      }
     }
   }
+
 
   @override
   void dispose() {

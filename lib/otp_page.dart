@@ -105,7 +105,7 @@ class _OtpPageState extends State<OtpPage> {
 
 
 
-  void _manualVerify() async{
+  void _manualVerify() async {
     if (otpCode != null && otpCode!.length == 6) {
       // Show a dialog to request notification permission
       bool permissionGranted = await showDialog(
@@ -155,6 +155,7 @@ class _OtpPageState extends State<OtpPage> {
                   );
 
                   if (agreed == true) {
+                    // Request notification permission
                     var status = await Permission.notification.request();
                     if (status.isPermanentlyDenied) {
                       await openAppSettings();
