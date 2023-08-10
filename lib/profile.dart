@@ -78,6 +78,8 @@ class _ProfileState extends State<Profile> {
 
     String name = nameControl.text;
     String phoneNumber = auth.currentUser!.phoneNumber!;
+    phoneNumber = '+91 ' + phoneNumber.substring(3, 8) + ' ' + phoneNumber.substring(8);
+
 
     try {
       QuerySnapshot snapshot = await firestore

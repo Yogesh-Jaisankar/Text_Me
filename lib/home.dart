@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:snapchat_clone/chat_user.dart';
+import 'package:snapchat_clone/contacts_page.dart';
 import 'package:snapchat_clone/edit_profile.dart';
 import 'package:snapchat_clone/helper/helper.dart';
-import 'package:snapchat_clone/profile.dart';
 import 'package:snapchat_clone/search.dart';
 import 'package:get/get.dart';
+
 
 
 class Home extends StatelessWidget {
@@ -102,7 +101,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 color: Colors.black54,
               ),
               onPressed: () {
-                Navigator.push(context,MaterialPageRoute(builder: (context) =>UserListPage()));
+                Navigator.push(context,MaterialPageRoute(builder: (context) =>ContactsPage()));
               },
             ),
           ),
