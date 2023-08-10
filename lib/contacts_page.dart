@@ -355,7 +355,6 @@ class _ContactsPageState extends State<ContactsPage> {
                       final message = 'Hey! Try out Text Me™. Download it from ....'; // Customize your message here
                       final url = 'sms:$phoneNumber?body=${Uri.encodeComponent(
                           message)}';
-
                       if (await canLaunch(url)) {
                         await launch(url);
                       } else {
