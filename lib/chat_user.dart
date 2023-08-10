@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:snapchat_clone/chat_screen.dart';
 
 
 class UserListPage extends StatefulWidget {
@@ -60,6 +61,15 @@ class _UserListPageState extends State<UserListPage> {
                   onTap: () {
                     // Handle the chat action here
                     print('Chat with $name');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          userName: name,
+                          userImageUrl: imageUrl,
+                        ),
+                      ),
+                    );
                     // You can open a chat screen or perform any other action
                   },
                  );
@@ -67,24 +77,6 @@ class _UserListPageState extends State<UserListPage> {
             );
            },
           ),
-          // Positioned(
-          //     left: 0,
-          //     right: 0,
-          //     bottom: 0,
-          //     child:Container(
-          //       //color: Colors.grey[200],
-          //       padding: EdgeInsets.symmetric(vertical: 8),
-          //       child: Center(
-          //         child: Text(
-          //           "Made with 💜 in India",
-          //           style: TextStyle(
-          //             color: Colors.black,
-          //             fontSize: 14,
-          //           ),
-          //         ),
-          //       ),
-          //     )
-          //   )
         ]
       ),
     );
