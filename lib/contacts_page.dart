@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactSearchDelegate extends SearchDelegate<Contact> {
   final List<Contact> contacts;
@@ -66,8 +67,19 @@ class ContactSearchDelegate extends SearchDelegate<Contact> {
             },
           )
               : ElevatedButton(
-            onPressed: () {
-              // Handle invite action
+            onPressed: () async {
+              final contact = searchResults.elementAt(index); // Use 'contact' from the respective method
+              final phoneNumber = contact.phones?.first.value ?? '';
+              final message = 'Join the app'; // Customize your message here
+
+              final url = 'sms:$phoneNumber?body=${Uri.encodeComponent(message)}';
+
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                // Handle error, maybe show a snackbar or dialog
+                print('Could not launch SMS app');
+              }
             },
             child: const Text("Invite"),
           ),
@@ -112,8 +124,20 @@ class ContactSearchDelegate extends SearchDelegate<Contact> {
             },
           )
               : ElevatedButton(
-            onPressed: () {
-              // Handle invite action
+            onPressed: () async {
+              final contact = suggestionList.elementAt(index); // Use 'searchResults' or 'suggestionList' accordingly
+              final phoneNumber = contact.phones?.first.value ?? '';
+
+              final message = 'Join the app'; // Customize your message here
+
+              final url = 'sms:$phoneNumber?body=${Uri.encodeComponent(message)}';
+
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                // Handle error, maybe show a snackbar or dialog
+                print('Could not launch SMS app');
+              }
             },
             child: const Text("Invite"),
           ),
@@ -176,6 +200,36 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
 
+  Future<void> _refreshContacts() async {
+    try {
+      setState(() {
+        _loadingContacts = true;
+      });
+      await _getContacts();
+      await _getFirebaseContactNumbers();
+      setState(() {
+        _loadingContacts = false;
+      });
+
+      // Show a snackbar for successful refresh
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Contacts refreshed successfully.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (error) {
+      // Show a snackbar for refresh failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to refresh contacts. Please try again.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     List<Contact> contactsInDatabase = [];
@@ -205,6 +259,22 @@ class _ContactsPageState extends State<ContactsPage> {
               );
             },
           ),
+          PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text('Refresh'),
+                value: 'refresh',
+              ),
+              // Add more menu items here
+            ],
+            onSelected: (value) {
+              // Handle menu item selection
+              if (value == 'refresh') {
+                _refreshContacts();
+              }
+              // Handle other menu items if needed
+            },
+          ),
         ],
       ),
       body: _loadingContacts
@@ -213,9 +283,10 @@ class _ContactsPageState extends State<ContactsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Lottie.asset(
-              'assets/lottie/loading.json', // Replace with your Lottie animation file path
-              width: 100,
-              height: 100,
+              'assets/lottie/loading.json',
+              // Replace with your Lottie animation file path
+              width: 500,
+              height: 500,
             ),
             SizedBox(height: 16),
             Text(
@@ -226,61 +297,80 @@ class _ContactsPageState extends State<ContactsPage> {
           ],
         ),
       )
-          : ListView.builder(
-        itemCount: contactsInDatabase.length + contactsNotInDatabase.length + 2,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            // Users on text me title
-            return const Padding(
+          : SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'Users on text me',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            );
-          } else if (index == contactsInDatabase.length + 1) {
-            // Invite others title
-            return const Padding(
+            ),
+            contactsInDatabase.isEmpty
+                ? Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'No contacts are in text me. Invite them to chat',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+                : ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: contactsInDatabase.length,
+              itemBuilder: (context, index) {
+                Contact contact = contactsInDatabase[index];
+                return ListTile(
+                  title: Text(contact.displayName ?? ''),
+                  subtitle: Text(contact.phones!.first.value ?? ''),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.chat),
+                    onPressed: () {
+                      // Handle chat action
+                    },
+                  ),
+                );
+              },
+            ),
+            Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'Invite others',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            );
-          } else if (index <= contactsInDatabase.length) {
-            // Users on text me contact item
-            Contact contact = contactsInDatabase[index - 1];
-            return ListTile(
-              title: Text(contact.displayName ?? ''),
-              subtitle: Text(contact.phones!.first.value ?? ''),
-              trailing: IconButton(
-                icon: const Icon(Icons.chat), // Chat icon for users on text me
-                onPressed: () {
-                  // Handle chat action
-                },
-              ),
-            );
-          } else {
-            // Invite others contact item
-            Contact contact = contactsNotInDatabase[index - contactsInDatabase.length - 2];
-            return ListTile(
-              title: Text(contact.displayName ?? ''),
-              subtitle: Text(contact.phones!.first.value ?? ''),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  // Handle invite action
-                },
-                child: const Text("Invite"),
-              ),
-            );
-          }
-        },
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: contactsNotInDatabase.length,
+              itemBuilder: (context, index) {
+                Contact contact = contactsNotInDatabase[index];
+                return ListTile(
+                  title: Text(contact.displayName ?? ''),
+                  subtitle: Text(contact.phones!.first.value ?? ''),
+                  trailing: ElevatedButton(
+                    onPressed: () async {
+                      final phoneNumber = contact.phones?.first.value ?? '';
+                      final message = 'Hey! Try out Text Me™. Download it from ....'; // Customize your message here
+                      final url = 'sms:$phoneNumber?body=${Uri.encodeComponent(
+                          message)}';
+
+                      if (await canLaunch(url)) {
+                        await launch(url);
+                      } else {
+                        // Handle error, maybe show a snackbar or dialog
+                        print('Could not launch SMS app');
+                      }
+                    },
+                    child: const Text("Invite"),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-
-
-
-
