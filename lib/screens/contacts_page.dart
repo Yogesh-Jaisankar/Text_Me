@@ -202,9 +202,6 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
-
-
-
   Future<void> _getContacts() async {
     Iterable<Contact> contacts = await ContactsService.getContacts();
     setState(() {
@@ -224,9 +221,6 @@ class _ContactsPageState extends State<ContactsPage> {
       _firebaseContactNumbers = contactNumbers;
     });
   }
-
-
-
 
   Future<void> _refreshContacts() async {
     try {
