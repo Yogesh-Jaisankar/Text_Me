@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
@@ -272,6 +273,7 @@ class _ContactsPageState extends State<ContactsPage> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 3,
         title: const Text('Contacts'),
         actions: [
           if (!_loadingContacts) // Only show search icon if contacts are loaded
@@ -323,83 +325,139 @@ class _ContactsPageState extends State<ContactsPage> {
           ],
         ),
       )
-          : SingleChildScrollView(
+          : RefreshIndicator(
+            onRefresh: _refreshContacts,
+            child: SingleChildScrollView(
         child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Users on text me',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.teal),
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Users on text me',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.teal),
+                ),
               ),
-            ),
-            contactsInDatabase.isEmpty
-                ? Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'No contacts are in text me. Invite them to chat',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            )
-                : ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: contactsInDatabase.length,
-              itemBuilder: (context, index) {
-                Contact contact = contactsInDatabase[index];
-                String formattedPhoneNumber = formatPhoneNumber(contact.phones!.first.value ?? '');
-                bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
-                return ListTile(
-                  title: Text(contact.displayName ?? ''),
-                    subtitle: Text(formattedPhoneNumber),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.chat),
-                    onPressed: () {
-                      // Handle chat action
-                    },
-                  ),
-                );
-              },
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Invite others',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.teal),
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: contactsNotInDatabase.length,
-              itemBuilder: (context, index) {
-                Contact contact = contactsNotInDatabase[index];
-                String formattedPhoneNumber = formatPhoneNumber(contact.phones!.first.value ?? '');
-                bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
-                return ListTile(
-                  title: Text(contact.displayName ?? ''),
-                    subtitle: Text(formattedPhoneNumber),
-                  trailing: ElevatedButton(
-                    onPressed: () async {
-                      final phoneNumber = contact.phones?.first.value ?? '';
-                      final message = 'Hey! Try out Text Me™. Download it from ....'; // Customize your message here
-                      final url = 'sms:$phoneNumber?body=${Uri.encodeComponent(
-                          message)}';
-                      if (await canLaunch(url)) {
-                        await launch(url);
+              contactsInDatabase.isEmpty
+                  ? Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'No contacts are in text me. Invite them to chat',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+                  : ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: contactsInDatabase.length,
+                itemBuilder: (context, index) {
+                  Contact contact = contactsInDatabase[index];
+                  String formattedPhoneNumber = formatPhoneNumber(contact.phones!.first.value ?? '');
+                  bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
+
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: _firestore.collection("user")
+                        .where("phone", isEqualTo: formattedPhoneNumber)
+                        .get()
+                        .then((snapshot) => snapshot.docs.isNotEmpty ? snapshot.docs.first : null!),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return ListTile(
+                          title: Text(contact.displayName ?? ''),
+                          subtitle: Text(formattedPhoneNumber),
+                          leading: CircleAvatar(
+                            radius: 20,
+                            child: Icon(Icons.person),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.chat),
+                            onPressed: () {
+                              // Handle chat action
+                            },
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return ListTile(
+                          title: Text(contact.displayName ?? ''),
+                          subtitle: Text(formattedPhoneNumber),
+                          leading: CircleAvatar(
+                            radius: 20,
+                            child: Icon(Icons.person),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.chat),
+                            onPressed: () {
+                              // Handle chat action
+                            },
+                          ),
+                        );
                       } else {
-                        // Handle error, maybe show a snackbar or dialog
-                        print('Could not launch SMS app');
+                        DocumentSnapshot? userDocument = snapshot.data;
+                        return ListTile(
+                          title: Text(contact.displayName ?? ''),
+                          subtitle: Text(formattedPhoneNumber),
+                          leading: userDocument != null
+                              ? CircleAvatar(
+                            radius: 20,
+                            backgroundImage: CachedNetworkImageProvider(userDocument["image link"]),
+                          )
+                              : CircleAvatar(
+                            radius: 20,
+                            child: Icon(Icons.person),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.chat),
+                            onPressed: () {
+                              // Handle chat action
+                            },
+                          ),
+                        );
                       }
                     },
-                    child: const Text("Invite"),
-                  ),
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+
+
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Invite others',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.teal),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: contactsNotInDatabase.length,
+                itemBuilder: (context, index) {
+                  Contact contact = contactsNotInDatabase[index];
+                  String formattedPhoneNumber = formatPhoneNumber(contact.phones!.first.value ?? '');
+                  bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
+                  return ListTile(
+                    title: Text(contact.displayName ?? ''),
+                      subtitle: Text(formattedPhoneNumber),
+                    trailing: ElevatedButton(
+                      onPressed: () async {
+                        final phoneNumber = contact.phones?.first.value ?? '';
+                        final message = 'Hey! Try out Text Me™. Download it from ....'; // Customize your message here
+                        final url = 'sms:$phoneNumber?body=${Uri.encodeComponent(
+                            message)}';
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        } else {
+                          // Handle error, maybe show a snackbar or dialog
+                          print('Could not launch SMS app');
+                        }
+                      },
+                      child: const Text("Invite"),
+                    ),
+                  );
+                },
+              ),
+            ],
         ),
       ),
+          ),
     );
   }
 }
