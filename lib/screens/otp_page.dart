@@ -240,6 +240,7 @@ class _OtpPageState extends State<OtpPage> {
                       Colors.teal
                     )
                   ):Pinput(
+                    keyboardType: TextInputType.number,
                     length: 6,
                     showCursor: true,
                     defaultPinTheme: PinTheme(

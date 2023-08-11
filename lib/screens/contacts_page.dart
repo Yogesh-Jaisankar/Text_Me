@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snapchat_clone/screens/chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -165,17 +166,57 @@ class _ContactsPageState extends State<ContactsPage> {
   bool _loadingContacts = true;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   late List<bool> _contactIcons;
+
+  late SharedPreferences _prefs;
+  static const String _lastSaveTimestampKey = 'lastSaveTimestamp';
+
+
 
   @override
   void initState() {
     super.initState();
+    _initSharedPreferences().then((_) {
+      try {
+        _checkAndLoadPage();
+      } catch (error) {
+        // Handle the error, e.g., show an error message
+        print('Error initializing page: $error');
+      }
+    });
     _getContacts();
     _loadContacts();
     _contactIcons = List.generate(_contacts.length, (_) => false);
     _getFirebaseContactNumbers();
   }
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<int?> _getLastSaveTimestamp() async {
+    return _prefs.getInt(_lastSaveTimestampKey);
+  }
+
+  Future<void> _checkAndLoadPage() async {
+    final lastSaveTimestamp = await _getLastSaveTimestamp();
+    if (lastSaveTimestamp != null) {
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+      final difference = currentTime - lastSaveTimestamp;
+      final hoursDifference = difference ~/ (1000 * 60 * 60); // Convert milliseconds to hours
+
+      if (hoursDifference < 24) {
+        // Load the saved page state without fetching new data
+        setState(() {
+          _loadingContacts = false;
+        });
+        return;
+      }
+    }
+
+    // Load new data and refresh the page
+    await _refreshContacts();
+  }
+
 
   Future<void> _loadContacts() async {
     Iterable<Contact> contacts = await ContactsService.getContacts();
@@ -224,6 +265,13 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
+  Future<void> _savePageState() async {
+    // Save your page state here
+    // For demonstration purposes, let's assume you're saving a boolean value
+    // indicating whether the page state has been saved
+    await _prefs.setBool('pageStateSaved', true);
+  }
+
   Future<void> _refreshContacts() async {
     try {
       setState(() {
@@ -234,6 +282,8 @@ class _ContactsPageState extends State<ContactsPage> {
       setState(() {
         _loadingContacts = false;
       });
+
+      await _savePageState(); // Save the refreshed page state
 
       // Show a snackbar for successful refresh
       ScaffoldMessenger.of(context).showSnackBar(
@@ -252,6 +302,7 @@ class _ContactsPageState extends State<ContactsPage> {
       );
     }
   }
+
 
   void _navigateToChat(String userName, String profileImage) {
     Navigator.push(
