@@ -1,10 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
   final String userName;
-  final String userImageUrl;
+  final String profileImage;
 
-  ChatScreen({required this.userName, required this.userImageUrl});
+  ChatScreen({required this.userName, required this.profileImage});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class ChatScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundImage: NetworkImage(userImageUrl),
+              backgroundImage: CachedNetworkImageProvider(profileImage),
             ),
             SizedBox(width: 10),
             Text(userName),

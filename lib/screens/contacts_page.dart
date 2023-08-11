@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:lottie/lottie.dart';
+import 'package:snapchat_clone/screens/chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactSearchDelegate extends SearchDelegate<Contact> {
@@ -252,6 +253,14 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
+  void _navigateToChat(String userName, String profileImage) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(userName: userName, profileImage: profileImage),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -360,6 +369,8 @@ class _ContactsPageState extends State<ContactsPage> {
                         .get()
                         .then((snapshot) => snapshot.docs.isNotEmpty ? snapshot.docs.first : null!),
                     builder: (context, snapshot) {
+                      DocumentSnapshot? userDocument;
+
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return ListTile(
                           title: Text(contact.displayName ?? ''),
@@ -372,6 +383,12 @@ class _ContactsPageState extends State<ContactsPage> {
                             icon: const Icon(Icons.chat),
                             onPressed: () {
                               // Handle chat action
+                              if (userDocument != null) {
+                                _navigateToChat(
+                                  userDocument["name"],
+                                  userDocument["image link"],
+                                );
+                              }
                             },
                           ),
                         );
@@ -387,11 +404,18 @@ class _ContactsPageState extends State<ContactsPage> {
                             icon: const Icon(Icons.chat),
                             onPressed: () {
                               // Handle chat action
+                              if (userDocument != null) {
+                                _navigateToChat(
+                                  userDocument["name"],
+                                  userDocument["image link"],
+                                );
+                              }
                             },
                           ),
                         );
                       } else {
-                        DocumentSnapshot? userDocument = snapshot.data;
+                        userDocument = snapshot.data;
+
                         return ListTile(
                           title: Text(contact.displayName ?? ''),
                           subtitle: Text(formattedPhoneNumber),
@@ -407,7 +431,12 @@ class _ContactsPageState extends State<ContactsPage> {
                           trailing: IconButton(
                             icon: const Icon(Icons.chat),
                             onPressed: () {
-                              // Handle chat action
+                              if (userDocument != null) {
+                                _navigateToChat(
+                                  userDocument["name"],
+                                  userDocument["image link"],
+                                );
+                              }
                             },
                           ),
                         );
