@@ -99,6 +99,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 
     void _saveProfile() async {
+      FocusScope.of(context).unfocus();
       if (!_isNetworkAvailable) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -117,6 +118,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
       String name = nameControl.text;
       String phoneNumber = auth.currentUser!.phoneNumber!;
+      phoneNumber = '+91 ' + phoneNumber.substring(3, 8) + ' ' + phoneNumber.substring(8);
 
       try {
         QuerySnapshot snapshot = await firestore
@@ -206,9 +208,11 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
     Future<void> fetchUserData() async {
       try {
         String phoneNumber = auth.currentUser!.phoneNumber!;
+        String formattedPhoneNumber = '+91 ' + phoneNumber.substring(3, 8) + ' ' + phoneNumber.substring(8);
+
         QuerySnapshot snapshot = await firestore
             .collection("user")
-            .where("phone", isEqualTo: phoneNumber)
+            .where("phone", isEqualTo: formattedPhoneNumber)
             .get();
 
         if (snapshot.docs.isNotEmpty) {
@@ -223,6 +227,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
         print("Error fetching user data: $error");
       }
     }
+
 
     Future<Uint8List> getDefaultProfileImage() async {
       // Load your default profile image asset and convert it to Uint8List

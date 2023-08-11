@@ -253,6 +253,7 @@ class _ContactsPageState extends State<ContactsPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
+              FocusScope.of(context).unfocus();
               showSearch(
                 context: context,
                 delegate: ContactSearchDelegate(_contacts, _firebaseContactNumbers),

@@ -68,7 +68,7 @@ class _ProfileState extends State<Profile> {
   }
 
 
-  void _saveProfile() async {
+  void _saveProfile() async {FocusScope.of(context).unfocus();
     if (_isButtonDisabled) return;
 
     setState(() {
