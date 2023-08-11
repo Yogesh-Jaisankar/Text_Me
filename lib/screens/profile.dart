@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapchat_clone/home.dart';
 import 'package:snapchat_clone/resource/add_data.dart';
-import 'package:snapchat_clone/utils.dart';
+import 'package:snapchat_clone/helper/utils.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});

@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pinput/pinput.dart';
-import 'package:snapchat_clone/home.dart';
-import 'package:snapchat_clone/profile.dart';
+import 'package:snapchat_clone/screens/profile.dart';
+
 
 class OtpPage extends StatefulWidget {
   @override

@@ -9,7 +9,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
   import 'package:photo_view/photo_view.dart';
   import 'package:snapchat_clone/home.dart';
   import 'package:snapchat_clone/resource/add_data.dart';
-  import 'package:snapchat_clone/utils.dart';
+  import 'package:snapchat_clone/helper/utils.dart';
 
 
   class Edit_Profile extends StatefulWidget {

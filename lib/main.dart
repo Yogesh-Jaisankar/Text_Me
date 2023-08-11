@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:snapchat_clone/home.dart';
-import 'package:snapchat_clone/login_screen.dart';
+import 'package:snapchat_clone/screens/login_screen.dart';
 
 
 
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       title: 'Text Me™',
       theme: ThemeData(
         fontFamily: 'Poppins',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal,),
         useMaterial3: true,
       ),
       home:  auth.currentUser==null?LoginPage():Home(),

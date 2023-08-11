@@ -1,4 +1,4 @@
-import 'package:snapchat_clone/login_screen.dart';
+import 'package:snapchat_clone/screens/login_screen.dart';
 import 'package:snapchat_clone/main.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

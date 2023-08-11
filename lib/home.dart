@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:snapchat_clone/contacts_page.dart';
-import 'package:snapchat_clone/edit_profile.dart';
 import 'package:snapchat_clone/helper/helper.dart';
+import 'package:snapchat_clone/screens/contacts_page.dart';
+import 'package:snapchat_clone/screens/edit_profile.dart';
 import 'package:snapchat_clone/search.dart';
 import 'package:get/get.dart';
 

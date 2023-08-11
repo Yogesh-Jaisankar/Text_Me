@@ -5,7 +5,8 @@ import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'otp_page.dart';
+import 'package:snapchat_clone/screens/otp_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   @override
