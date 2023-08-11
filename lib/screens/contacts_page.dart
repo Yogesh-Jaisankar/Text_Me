@@ -164,11 +164,14 @@ class _ContactsPageState extends State<ContactsPage> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  late List<bool> _contactIcons;
+
   @override
   void initState() {
     super.initState();
     _getContacts();
     _loadContacts();
+    _contactIcons = List.generate(_contacts.length, (_) => false);
     _getFirebaseContactNumbers();
   }
 
@@ -178,7 +181,29 @@ class _ContactsPageState extends State<ContactsPage> {
       _contacts = contacts.toList();
       _loadingContacts = false;
     });
+
+    // Initialize _contactIcons list with false values
+    _contactIcons = List.generate(_contacts.length, (_) => false);
+
+    for (int i = 0; i < _contacts.length; i++) {
+      Contact contact = _contacts[i];
+
+      // Check if the contact has phone numbers
+      if (contact.phones != null && contact.phones!.isNotEmpty) {
+        String phoneNumber = contact.phones!.first.value ?? '';
+        String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+
+        // Check if the formatted phone number exists in Firebase
+        bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
+        setState(() {
+          _contactIcons[i] = isInFirebase;
+        });
+      }
+    }
   }
+
+
+
 
   Future<void> _getContacts() async {
     Iterable<Contact> contacts = await ContactsService.getContacts();
@@ -193,13 +218,13 @@ class _ContactsPageState extends State<ContactsPage> {
     for (QueryDocumentSnapshot doc in snapshot.docs) {
       String phoneNumber = doc["phone"];
       String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-      print("Original: $phoneNumber, Formatted: $formattedPhoneNumber");
       contactNumbers.add(formattedPhoneNumber);
     }
     setState(() {
       _firebaseContactNumbers = contactNumbers;
     });
   }
+
 
 
 
@@ -235,19 +260,21 @@ class _ContactsPageState extends State<ContactsPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Contact> contactsInDatabase = [];
-    List<Contact> contactsNotInDatabase = [];
-
-    for (var contact in _contacts) {
+    List<Contact> contactsInDatabase = _contacts.where((contact) {
       if (contact.phones != null && contact.phones!.isNotEmpty) {
         String phoneNumber = contact.phones!.first.value ?? '';
-        if (_firebaseContactNumbers.contains(phoneNumber)) {
-          contactsInDatabase.add(contact);
-        } else {
-          contactsNotInDatabase.add(contact);
-        }
+        return _firebaseContactNumbers.contains(formatPhoneNumber(phoneNumber));
       }
-    }
+      return false;
+    }).toList();
+
+    List<Contact> contactsNotInDatabase = _contacts.where((contact) {
+      if (contact.phones != null && contact.phones!.isNotEmpty) {
+        String phoneNumber = contact.phones!.first.value ?? '';
+        return !_firebaseContactNumbers.contains(formatPhoneNumber(phoneNumber));
+      }
+      return false;
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -326,9 +353,11 @@ class _ContactsPageState extends State<ContactsPage> {
               itemCount: contactsInDatabase.length,
               itemBuilder: (context, index) {
                 Contact contact = contactsInDatabase[index];
+                String formattedPhoneNumber = formatPhoneNumber(contact.phones!.first.value ?? '');
+                bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
                 return ListTile(
                   title: Text(contact.displayName ?? ''),
-                  subtitle: Text(contact.phones!.first.value ?? ''),
+                    subtitle: Text(formattedPhoneNumber),
                   trailing: IconButton(
                     icon: const Icon(Icons.chat),
                     onPressed: () {
@@ -351,9 +380,11 @@ class _ContactsPageState extends State<ContactsPage> {
               itemCount: contactsNotInDatabase.length,
               itemBuilder: (context, index) {
                 Contact contact = contactsNotInDatabase[index];
+                String formattedPhoneNumber = formatPhoneNumber(contact.phones!.first.value ?? '');
+                bool isInFirebase = _firebaseContactNumbers.contains(formattedPhoneNumber);
                 return ListTile(
                   title: Text(contact.displayName ?? ''),
-                  subtitle: Text(contact.phones!.first.value ?? ''),
+                    subtitle: Text(formattedPhoneNumber),
                   trailing: ElevatedButton(
                     onPressed: () async {
                       final phoneNumber = contact.phones?.first.value ?? '';
@@ -380,14 +411,19 @@ class _ContactsPageState extends State<ContactsPage> {
 }
 
 String formatPhoneNumber(String phoneNumber) {
-  if (phoneNumber.length == 10) {
+  // Remove all non-digit characters from the phone number
+  String digitsOnly = phoneNumber.replaceAll(RegExp(r'\D'), '');
+
+  if (digitsOnly.length == 10) {
     // Format "xxxxxxxxxx" to "+91 xxxxx xxxxx"
-    return "+91 ${phoneNumber.substring(0, 5)} ${phoneNumber.substring(5)}";
-  } else if (phoneNumber.length == 12) {
+    return "+91 ${digitsOnly.substring(0, 5)} ${digitsOnly.substring(5)}";
+  } else if (digitsOnly.length == 10) {
     // Format "xxxxx xxxxx" to "+91 xxxxx xxxxx"
-    return "+91 ${phoneNumber.substring(0, 5)} ${phoneNumber.substring(6)}";
+    return "+91 ${digitsOnly.substring(0, 5)} ${digitsOnly.substring(6)}";
   } else {
     // Return as is (no formatting applied)
     return phoneNumber;
   }
 }
+
+
