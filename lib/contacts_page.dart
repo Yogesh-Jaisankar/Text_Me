@@ -192,12 +192,15 @@ class _ContactsPageState extends State<ContactsPage> {
     List<String> contactNumbers = [];
     for (QueryDocumentSnapshot doc in snapshot.docs) {
       String phoneNumber = doc["phone"];
-      contactNumbers.add(phoneNumber);
+      String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+      print("Original: $phoneNumber, Formatted: $formattedPhoneNumber");
+      contactNumbers.add(formattedPhoneNumber);
     }
     setState(() {
       _firebaseContactNumbers = contactNumbers;
     });
   }
+
 
 
   Future<void> _refreshContacts() async {
@@ -373,5 +376,18 @@ class _ContactsPageState extends State<ContactsPage> {
         ),
       ),
     );
+  }
+}
+
+String formatPhoneNumber(String phoneNumber) {
+  if (phoneNumber.length == 10) {
+    // Format "xxxxxxxxxx" to "+91 xxxxx xxxxx"
+    return "+91 ${phoneNumber.substring(0, 5)} ${phoneNumber.substring(5)}";
+  } else if (phoneNumber.length == 12) {
+    // Format "xxxxx xxxxx" to "+91 xxxxx xxxxx"
+    return "+91 ${phoneNumber.substring(0, 5)} ${phoneNumber.substring(6)}";
+  } else {
+    // Return as is (no formatting applied)
+    return phoneNumber;
   }
 }
