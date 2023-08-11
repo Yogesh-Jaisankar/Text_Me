@@ -250,16 +250,17 @@ class _ContactsPageState extends State<ContactsPage> {
       appBar: AppBar(
         title: const Text('Contacts'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              FocusScope.of(context).unfocus();
-              showSearch(
-                context: context,
-                delegate: ContactSearchDelegate(_contacts, _firebaseContactNumbers),
-              );
-            },
-          ),
+          if (!_loadingContacts) // Only show search icon if contacts are loaded
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                showSearch(
+                  context: context,
+                  delegate: ContactSearchDelegate(_contacts, _firebaseContactNumbers),
+                );
+              },
+            ),
           PopupMenuButton(
             itemBuilder: (context) => [
               PopupMenuItem(
@@ -305,7 +306,7 @@ class _ContactsPageState extends State<ContactsPage> {
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'Users on text me',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.teal),
               ),
             ),
             contactsInDatabase.isEmpty
@@ -338,7 +339,7 @@ class _ContactsPageState extends State<ContactsPage> {
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'Invite others',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.teal),
               ),
             ),
             ListView.builder(
