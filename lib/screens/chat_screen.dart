@@ -15,6 +15,9 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+
+  //check for bug
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isTyping = false;
   FocusNode _textFieldFocusNode = FocusNode();
   bool _showEmoji = false;
@@ -36,6 +39,8 @@ class _ChatScreenState extends State<ChatScreen> {
         _closeEmojiPicker();
       },
       child: Scaffold(
+        //check for bug
+        key: _scaffoldKey,
         appBar: AppBar(
           elevation: 3,
           title: Row(
@@ -116,7 +121,18 @@ class _ChatScreenState extends State<ChatScreen> {
                               onPressed: () {
                                 _closeEmojiPicker();
                                 _textFieldFocusNode.unfocus();
-                                print("Sent to ${widget.userName}");
+                                // Show a snackbar using ScaffoldMessenger
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    duration: Duration(milliseconds: 500,),
+                                    content: Text('Yet to be implemented'),
+                                  ),
+                                );
+                                _textController.clear();
+                                print("Sent to ${widget.userName}"
+
+                                );
                               },
                             ),
                           ),
@@ -174,6 +190,8 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_showEmoji) {
       setState(() {
         _showEmoji = false;
+        //check for bug
+        _textController.clear();
       });
     }
   }

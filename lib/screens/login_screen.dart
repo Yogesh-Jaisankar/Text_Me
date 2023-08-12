@@ -120,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
       Get.snackbar(
         "Please enter the mobile number!",
         "Login Failed",
+        duration: Duration(milliseconds: 500,),
         colorText: Colors.black54,
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -189,6 +190,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
 
+    double screenWidth = MediaQuery.of(context).size.width;
+
     phoneController.selection = TextSelection.fromPosition(
       TextPosition(
         offset: phoneController.text.length,
@@ -206,16 +209,16 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(height: 100),
-                Text('Hey! Login',style: TextStyle(color: Colors.teal,fontSize: 30),),
-                SizedBox(height: 50),
+                Text('Hey! Login',style: TextStyle(color: Colors.teal,fontSize: screenWidth > 600 ? 30 : 24,),),
+                SizedBox(height: screenWidth > 600 ? 50 : 30),
                 Lottie.asset("assets/lottie/sec1.json",
                   width: 200,
                   height: 200,
                   //fit: BoxFit.fill,
                 ),
-                SizedBox(height: 50),
-                Text('Please confirm your country code and enter your mobile number!',style: TextStyle(color: Colors.black54,fontSize: 15),textAlign: TextAlign.center,),
-                SizedBox(height: 50),
+                SizedBox(height: screenWidth > 600 ? 50 : 30),
+                Text('Please confirm your country code and enter your mobile number!',style: TextStyle(color: Colors.black54, fontSize: screenWidth > 600 ? 15 : 12),textAlign: TextAlign.center,),
+                SizedBox(height: screenWidth > 600 ? 50 : 30),
                 Container(
                   margin: EdgeInsets.fromLTRB(30, 10, 30, 10),
                   child: TextFormField(
@@ -296,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: screenWidth > 600 ? 30 : 20),
                 ElevatedButton(
                   style: style,
                   onPressed: _isLoading || !_isInternetConnected // Disable button if no internet
@@ -309,13 +312,12 @@ class _LoginPageState extends State<LoginPage> {
                       : Text(
                     _isInternetConnected ? 'GET OTP' : 'Check your network connection',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: screenWidth > 600 ? 14 : 12,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(height: 80),
               ],
             ),
           ),

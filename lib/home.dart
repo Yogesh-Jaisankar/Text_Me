@@ -7,8 +7,30 @@ import 'package:get/get.dart';
 
 
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class Home extends StatefulWidget {
+  final String userName;
+  const Home({super.key, required this.userName});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Show a welcome snack bar with the user's name
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(milliseconds: 500,),
+            content: Text("Welcome, ${widget.userName}!")),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +38,8 @@ class Home extends StatelessWidget {
     //   return false; //<-- SEE HERE
     // }
     authservice authService = authservice();
+
+
     return  WillPopScope(
       //onWillPop: _onWillPop,
       child: Scaffold(
@@ -56,6 +80,8 @@ class Home extends StatelessWidget {
     );
   }
 }
+
+
 
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -110,7 +136,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.all(5.0),
           child: CircleAvatar(
             radius: 20,
-            backgroundColor: Colors.black12, //<-- SEE HERE
+            backgroundColor: Colors.black12,
             child:PopupMenuButton<String>(
               enableFeedback: true,
                 itemBuilder: (BuildContext context){
@@ -121,9 +147,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     )
                     ),
-                    PopupMenuItem(child: Text("Help"),onTap: (){
-                      //_launchUrlhelp();
-                    },),
+                    // PopupMenuItem(child: Text("Help"),onTap: (){
+                    //   //_launchUrlhelp();
+                    // },),
                     PopupMenuItem(child: Text("Log Out"),onTap: (){
                       Get.snackbar(
                         "Logged Out Successfully",
@@ -133,7 +159,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       );
                       authservice AuthService = authservice();
                       authService.logOutUser(context);
-
                     },)
                     ,
                   ];

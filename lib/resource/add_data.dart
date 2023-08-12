@@ -51,7 +51,7 @@ class StoreData{
 
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (C) => Home()),
+          MaterialPageRoute(builder: (C) => Home(userName: '',)),
               (route) => false,
         );
         resp = "Success";

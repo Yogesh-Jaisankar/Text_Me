@@ -33,6 +33,8 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
     bool _isOnline = false;
     bool _isNetworkAvailable = true;
 
+    bool changesMade = false;
+
     @override
     void initState() {
       super.initState();
@@ -93,6 +95,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
       Uint8List img = await pickImage(ImageSource.gallery);
       setState(() {
         _image=img;
+        changesMade = true;
       });
 
     }
@@ -100,11 +103,13 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
     void _saveProfile() async {
       FocusScope.of(context).unfocus();
+      bool _isNetworkAvailable = await InternetConnectionChecker().hasConnection;
       if (!_isNetworkAvailable) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('No internet connection. Changes will be saved when the network is available.'),
-            duration: Duration(seconds: 3),
+            content: Text('No internet connection. Update failed.'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
           ),
         );
         return;
@@ -114,6 +119,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
       setState(() {
         _isButtonDisabled = true;
         _showProgressIndicator = true;
+        changesMade = false;
       });
 
       String name = nameControl.text;
@@ -165,13 +171,15 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
         setState(() {
           _showProgressIndicator = false;
           _isButtonDisabled = false;
+
         });
 
         // Show a success Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(milliseconds: 500,),
             content: Text('Profile updated successfully!'),
-            duration: Duration(seconds: 2),
           ),
         );
 
@@ -239,6 +247,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
     void _updateNameField(String text) {
       setState(() {
         _isNameFieldEmpty = text.isEmpty && _currentName.isEmpty;
+        changesMade = true;
       });
     }
 
@@ -292,6 +301,10 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
     @override
     Widget build(BuildContext context) {
+
+      final double screenWidth = MediaQuery.of(context).size.width;
+      final double screenHeight = MediaQuery.of(context).size.height;
+
       return  Scaffold(
           appBar: AppBar(
             title: Text("Profile"),
@@ -299,8 +312,9 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
           body: SingleChildScrollView(
             child: Container(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 10 ),
+                  SizedBox(height: screenHeight * 0.02),
                   GestureDetector(
                     onTap: () {
                       _showImageFullScreen(context);
@@ -328,7 +342,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   GestureDetector(
                     //onTap: _selectImage,
                     child: Center(
@@ -338,8 +352,9 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
                       ),
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.05),
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
                     child: TextField(
                       controller: nameControl,
                       onChanged: _updateNameField,
@@ -352,25 +367,25 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
                       ),
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.01),
                   Center(
                     child: Text(
                       "Change name",
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.05),
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
                     child: ElevatedButton(
                       style: style,
-                      onPressed: _isButtonDisabled || (!_isNetworkAvailable && (_isNameFieldEmpty && _image == null))
+                      onPressed: (_isButtonDisabled || (!_isNetworkAvailable && (_isNameFieldEmpty && _image == null)) || !changesMade) // Update this condition
                           ? null
                           : _saveProfile,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _showProgressIndicator
-                              ? CircularProgressIndicator()
-                              : SizedBox(),
+                          _showProgressIndicator ? CircularProgressIndicator() : SizedBox(),
                           SizedBox(
                             width: _showProgressIndicator ? 10 : 0,
                           ),
@@ -385,19 +400,22 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
                       ),
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.05),
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
                     child: Text(
                       _isOnline
                           ? 'You are online'
                           : 'You are offline. Profile cannot be updated.',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: _isOnline ? Colors.green : Colors.red,
                       ),
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.05),
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
                     child: TextButton(
                       onPressed: _showTermsAndConditionsDialog,
                       child: Text(

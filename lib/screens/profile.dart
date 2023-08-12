@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snapchat_clone/home.dart';
 import 'package:snapchat_clone/resource/add_data.dart';
 import 'package:snapchat_clone/helper/utils.dart';
@@ -17,6 +19,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
 
+  late final SharedPreferences prefs;
   final TextEditingController nameControl = TextEditingController();
   final firestore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
@@ -25,6 +28,8 @@ class _ProfileState extends State<Profile> {
   bool _isButtonDisabled = false;
   bool _showProgressIndicator = false;
   bool _isNameFieldEmpty = true;
+  bool _isImageSelected = false;
+
 
   void _showTermsAndConditionsDialog() {
     showDialog(
@@ -63,12 +68,38 @@ class _ProfileState extends State<Profile> {
     Uint8List img = await pickImage(ImageSource.gallery);
     setState(() {
       _image=img;
+      _isImageSelected = true;
     });
 
   }
 
 
-  void _saveProfile() async {FocusScope.of(context).unfocus();
+  void _saveProfile() async {
+    bool _isNetworkAvailable = await InternetConnectionChecker().hasConnection;
+    FocusScope.of(context).unfocus();
+
+    if (!_isNetworkAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No internet connection. Update failed.'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          _isButtonDisabled = false;
+        });
+      });
+      return;
+    }
+    if (!_isImageSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select an image before continuing.")),
+      );
+      return;
+    }
     if (_isButtonDisabled) return;
 
     setState(() {
@@ -127,13 +158,22 @@ class _ProfileState extends State<Profile> {
         _isButtonDisabled = false;
       });
 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('profile_complete', true);
+      prefs.setString('user_name', name);
+      prefs.setBool('profile_saving', true);
+      prefs.remove('profile_saving');
+
       // Navigate to the home page after successful saving
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Home()),
+        MaterialPageRoute(builder: (context) => Home(userName: name)),
             (route) => false,
       );
+      prefs.setBool('profile_saved', true);
     } catch (error) {
+      prefs.setBool('profile_saved', false);
+      prefs.remove('profile_saving');
       print("Error: $error");
       setState(() {
         _showProgressIndicator = false;
@@ -170,7 +210,18 @@ class _ProfileState extends State<Profile> {
         child: Container(
           child: Column(
             children: [
-              SizedBox(height: 10 ),
+          Column(
+          children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02), // Adjust this factor as needed
+              Text(
+                "Save your profile to proceed further",
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust this factor as needed
+                  color: Colors.teal,
+                ),
+                textAlign: TextAlign.center,
+              ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Stack(
                 children: [
                   _image !=null?
@@ -191,7 +242,7 @@ class _ProfileState extends State<Profile> {
                   )
                 ],
               ),
-              SizedBox(height: 5),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Center(
                 child: Text(
                   "Profile pic can be changed later",
@@ -216,7 +267,7 @@ class _ProfileState extends State<Profile> {
                 padding: const EdgeInsets.all(30.0),
                 child: ElevatedButton(
                   style: style,
-                  onPressed: _isButtonDisabled || _isNameFieldEmpty
+                  onPressed: _isButtonDisabled || !_isImageSelected || _isNameFieldEmpty
                       ? null
                       : _saveProfile,
                   child: Row(
@@ -237,7 +288,8 @@ class _ProfileState extends State<Profile> {
                       ),
                     ],
                   ),
-                ),
+                )
+
               ),
               Padding(
                 padding: const EdgeInsets.all(30.0),
@@ -254,8 +306,9 @@ class _ProfileState extends State<Profile> {
               ),
             ],
           ),
-        ),
+        ]),
       )
+    )
     );
   }
 }

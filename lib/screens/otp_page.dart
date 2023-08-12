@@ -214,6 +214,7 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -221,19 +222,20 @@ class _OtpPageState extends State<OtpPage> {
         // backgroundColor: Color(0xff215D5F),
         body: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(height: 100),
-              Text('Enter 6 digit OTP',style: TextStyle(color: Colors.teal,fontSize: 30),textAlign: TextAlign.center,), Text('sent to your number',style: TextStyle(color: Colors.teal,fontSize: 30),textAlign: TextAlign.center,),
-                SizedBox(height: 50),
+              Text('Enter 6 digit OTP',style: TextStyle(color: Colors.teal, fontSize: screenSize.width * 0.06,),textAlign: TextAlign.center,),
+                Text('sent to your number',style: TextStyle(color: Colors.teal, fontSize: screenSize.width * 0.06,),textAlign: TextAlign.center,),
+                SizedBox(height: screenSize.height * 0.05),
                 Lottie.asset("assets/lottie/otp.json",
-                  width: 200,
-                  height: 200,
+                  width: screenSize.width * 0.5,
+                  height: screenSize.width * 0.5,
                   //fit: BoxFit.fill,
                 ),
-                SizedBox(height: 50),
+                SizedBox(height: screenSize.height * 0.05),
                 Center(
                   child: _isVerified?CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation(
@@ -264,7 +266,7 @@ class _OtpPageState extends State<OtpPage> {
                     },
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: screenSize.height * 0.03),
                 ElevatedButton(
                     style: style,
                     onPressed: _manualVerify,
@@ -272,7 +274,7 @@ class _OtpPageState extends State<OtpPage> {
                       'Verify OTP',
                       style: TextStyle(fontSize: 14, color: Colors.white,fontWeight: FontWeight.bold),
                     )),
-                const SizedBox(height: 80),
+                SizedBox(height: screenSize.height * 0.08),
                 const Text(
                   "Didn't receive any code?",
                   style: TextStyle(fontSize: 12, color: Colors.black),
